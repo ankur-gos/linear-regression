@@ -44,6 +44,21 @@ def graph_error(x, training, test):
     ax.plot(x, test)
     plt.show()
 
+def graph_mse(r1, r2, r3):
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    t = 0
+    x = []
+    for i in range(0, len(r1)):
+        x.append(t)
+        t += 100
+    ax.plot(x, r1, label='alpha=0.1')
+    ax.plot(x, r2, label='alpha=0.01')
+    ax.plot(x, r3, label='alpha=0.001')
+    plt.legend()
+    plt.show()
+        
+
 def generateSets(k, m=10000):
     training_features, training_labels = generateMSE(m, 0.01)
     test_features, test_labels = generateMSE(m, 0.01)
@@ -144,7 +159,30 @@ def gd_results():
     run_gd(0.01, data, labels)
     run_gd(0.001, data, labels)
 
-gd_results()
+def stochastic_gradient_descent(T, alpha, data, labels):
+    d = np.matrix(data)
+    # label_y = np.matrix(labels)
+    theta = np.transpose(np.matrix([0, 0]))
+    results = []
+    for step in range(0, T):
+        if step % 100 == 0:
+            results.append(calculate_j(theta, d, labels))
+        i = random.choice(range(0, 10000))
+        sample = d[i,:]
+        sample_label = labels[i]
+        theta = theta + alpha*(sample_label - squeeze(np.dot(sample, theta))) * np.transpose(sample)
+    return results
+
+def sgd_results():
+    data, labels = generateMSE(10000, 1)
+    r1 = stochastic_gradient_descent(10000, 0.1, data, labels)
+    r2 = stochastic_gradient_descent(10000, 0.01, data, labels)
+    r3 = stochastic_gradient_descent(10000, 0.001, data, labels)
+    graph_mse(r1, r2, r3)
+
+sgd_results()
+
+# gd_results()
 
 def run():
     # ks = [1000 * n for n in range(1, 10)]
